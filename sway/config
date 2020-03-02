@@ -1,4 +1,6 @@
-exec xrdb -load ~/.Xresources
+# xrdb -load ~/.Xresources
+
+font Terminus (TTF)
 
 bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
@@ -7,14 +9,10 @@ bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 bindsym XF86MonBrightnessDown exec light -U 10
 bindsym XF86MonBrightnessUp exec light -A 10
 bindsym XF86Search exec $menu
-bindsym XF86AudioPlay exec playerctl play
-bindsym XF86AudioPause exec playerctl pause
+bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
-
-#set $laptop eDP-1
-#bindswitch lid:on output $laptop disable
-#bindswitch lid:off output $laptop enable
+bindsym Print exec grim -g "$(slurp)" - | wl-copy
 
 ### Variables
 #
@@ -38,43 +36,40 @@ set $menu dmenu_path | dmenu_extended_run | xargs swaymsg exec
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /home/purisame/Documents/pictures/plant.svg.png fill
 #
 # Example configuration:
 #
 #   output HDMI-A-1 resolution 1920x1080 position 1920,0
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
-output eDP-1 scale 1.5
+
+output * bg /home/purisame/Documents/pictures/plant.svg.png fill
+output eDP-1 scale 1.0 scale_filter linear
+output HDMI-A-1 resolution 2560x1440 scale_filter linear
 
 ### Idle configuration
-#
-# Example configuration:
-#
-# exec swayidle -w \
-#          timeout 300 'swaylock -f -c 000000' \
-#          timeout 600 'swaymsg "output * dpms off"' \
-#               resume 'swaymsg "output * dpms on"' \
-#          before-sleep 'swaylock -f -c 000000'
-#
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
-#exec swayidle -w \
-#         timeout 300 'swaylock -f' \
-#         timeout 600 'swaymsg "output * dpms off"' \
-#              resume 'swaymsg "output * dpms on"' \
-#         before-sleep 'swaylock -f'
+exec swayidle -w timeout 300 'swaylock -f' timeout 600 'swaymsg "output * dpms off"' \
+         resume 'swaymsg "output * dpms on"' \
+         before-sleep 'swaylock -f' \
+         idlehint 270 \
+         lock 'swaylock -f'
+
 set $mode_system System (l) lock, (s) suspend
 mode "$mode_system" {
-    bindsym l exec --no-startup-id swaylock, mode "default"
-    bindsym s exec --no-startup-id i3exit logout, mode "default"
+    bindsym l exec --no-startup-id loginctl lock-session, mode "default"
+    bindsym s exec --no-startup-id systemctl suspend, mode "default"
 
-    # back to normal: Enter or Escape
+# back to normal: Enter or Escape
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
 bindsym $mod+z mode "$mode_system"
+
+set $mode_vnc VNC ($mod+Escape) exit
+mode "$mode_vnc" {
+        bindsym $mod+Escape mode "default"
+}
+bindsym $mod+Backspace mode "$mode_vnc"
 
 ### Input configuration
 #
@@ -92,7 +87,7 @@ bindsym $mod+z mode "$mode_system"
 input * xkb_layout "us"
 input * xkb_variant "dvorak"
 
-input "1739:30383:DELL07E6:00_06CB:76AF_Touchpad" {
+input "2:8:AlpsPS/2_ALPS_GlidePoint" {
     dwt disabled
     tap enabled
     tap_button_map lrm
@@ -105,62 +100,62 @@ input "1739:30383:DELL07E6:00_06CB:76AF_Touchpad" {
 #
 # Basics:
 #
-    # start a terminal
-    bindsym $mod+Return exec $term
+# start a terminal
+bindsym $mod+Return exec $term
 
-    # kill focused window
-    bindsym $mod+Shift+q kill
+# kill focused window
+bindsym $mod+Shift+q kill
 
-    # start your launcher
-    bindsym $mod+d exec $menu
+# start your launcher
+bindsym $mod+d exec $menu
 
-    # Drag floating windows by holding down $mod and left mouse button.
-    # Resize them with right mouse button + $mod.
-    # Despite the name, also works for non-floating windows.
-    # Change normal to inverse to use left mouse button for resizing and right
-    # mouse button for dragging.
-    floating_modifier $mod normal
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod normal
 
-    # reload the configuration file
-    bindsym $mod+Shift+r reload
+# reload the configuration file
+bindsym $mod+Shift+r reload
 
-    # exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+# exit sway (logs you out of your Wayland session)
+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
 #
-    # Move your focus around
-    bindsym $mod+$left focus left
-    bindsym $mod+$down focus down
-    bindsym $mod+$up focus up
-    bindsym $mod+$right focus right
-    # or use $mod+[up|down|left|right]
-    bindsym $mod+Left focus left
-    bindsym $mod+Down focus down
-    bindsym $mod+Up focus up
-    bindsym $mod+Right focus right
+# Move your focus around
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+# or use $mod+[up|down|left|right]
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
 
-    # _move_ the focused window with the same, but add Shift
-    bindsym $mod+Shift+$left move left
-    bindsym $mod+Shift+$down move down
-    bindsym $mod+Shift+$up move up
-    bindsym $mod+Shift+$right move right
-    # ditto, with arrow keys
-    bindsym $mod+Shift+Left move left
-    bindsym $mod+Shift+Down move down
-    bindsym $mod+Shift+Up move up
-    bindsym $mod+Shift+Right move right
+# _move_ the focused window with the same, but add Shift
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+# ditto, with arrow keys
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
 #
 # Workspaces:
 #
-    # switch to workspace
-    bindsym $mod+1 workspace 1
-    bindsym $mod+2 workspace 2
-    bindsym $mod+3 workspace 3
-    bindsym $mod+4 workspace 4
-    bindsym $mod+5 workspace 5
-    bindsym $mod+6 workspace 6
-    bindsym $mod+7 workspace 7
+# switch to workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
     bindsym $mod+8 workspace 8
     bindsym $mod+9 workspace 9
     bindsym $mod+0 workspace 10
@@ -250,6 +245,7 @@ bar {
     # The default just shows the current date and time.
     # status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
     status_command i3status
+    font Terminus (TTF)
 
     colors {
         statusline #ffffff
@@ -259,3 +255,4 @@ bar {
 }
 
 include @sysconfdir@/sway/config.d/*
+
